@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Recommendation System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Video Recommendation System</h1>
+    <form id="recommendation-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" required>
+        
+        <label for="category_id">Category ID:</label>
+        <input type="number" id="category_id" required>
+
+        <label for="mood">Mood:</label>
+        <input type="text" id="mood" required>
+
+        <button type="submit">Get Recommendations</button>
+    </form>
+
+    <h2>Recommendations:</h2>
+    <div id="recommendations"></div>
+
+    <script>
+        document.getElementById('recommendation-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const categoryId = document.getElementById('category_id').value;
+            const mood = document.getElementById('mood').value;
+
+            fetch(`/feed?username=${username}&category_id=${categoryId}&mood=${mood}`)
+                .then(response => response.json())
+                .then(data => {
+                    const recommendationsDiv = document.getElementById('recommendations');
+                    recommendationsDiv.innerHTML = ''; // Clear previous recommendations
+                    
+                    if (data.error) {
+                        recommendationsDiv.innerHTML = `<p>${data.error}</p>`;
+                    } else {
+                        data.forEach(video => {
+                            const videoElement = document.createElement('div');
+                            videoElement.textContent = `Post ID: ${video.post_id}, User ID: ${video.user_id}`;
+                            recommendationsDiv.appendChild(videoElement);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching recommendations:', error);
+                });
+        });
+    </script>
+</body>
+</html>
